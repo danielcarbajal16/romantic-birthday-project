@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf5e9">
+<meta name="robots" content="noindex, nofollow">
+<title>Para ti, mi amor</title>
+<style>
+/* =========================================================
+   Variables de diseño
+   ========================================================= */
+:root {
+  --cream: #fbf5e9;
+  --cream-2: #f6ecdb;
+  --paper: #fffaf0;
+  --rose-pastel: #f2cfd2;
+  --rose: #e2a3ab;
+  --rose-old: #c08497;
+  --rose-deep: #8f4a5d;
+  --ink: #4a2c33;
+  --ink-soft: #7d5a62;
+  --serif: "Cormorant Garamond", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: var(--ink);
+  font-family: var(--sans);
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(242,207,210,.55), transparent 55%),
+    radial-gradient(ellipse at 90% 100%, rgba(226,163,171,.30), transparent 55%),
+    var(--cream);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* Foco visible para navegación por teclado */
+:focus-visible {
+  outline: 3px solid var(--rose-deep);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* =========================================================
+   Capa de corazones flotantes (decorativa)
+   ========================================================= */
+#hearts-layer {
+  position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 20;
+}
+.float-heart {
+  position: absolute; bottom: -30px;
+  width: var(--s, 18px); height: var(--s, 18px);
+  color: var(--c, var(--rose));
+  opacity: 0;
+  animation: floatUp var(--d, 9s) ease-in forwards;
+  will-change: transform, opacity;
+}
+.float-heart svg { width: 100%; height: 100%; fill: currentColor; display: block; }
+@keyframes floatUp {
+  0%   { transform: translate3d(0, 0, 0) rotate(-8deg); opacity: 0; }
+  12%  { opacity: var(--o, .55); }
+  50%  { transform: translate3d(var(--x, 20px), -55vh, 0) rotate(8deg); }
+  100% { transform: translate3d(calc(var(--x, 20px) * -1), -112vh, 0) rotate(-6deg); opacity: 0; }
+}
+
+/* =========================================================
+   Botón de música
+   ========================================================= */
+.music-btn {
+  position: fixed; top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right));
+  z-index: 40;
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 48px; padding: 0 18px;
+  font: 500 .95rem var(--sans);
+  color: var(--rose-deep);
+  background: rgba(255,250,240,.92);
+  border: 1px solid var(--rose);
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(143,74,93,.15);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background .25s, transform .15s;
+}
+.music-btn:active { transform: scale(.97); }
+.music-btn[aria-pressed="true"] { background: var(--rose-pastel); }
+.music-btn .note { font-size: 1.15rem; line-height: 1; }
+.music-btn[aria-pressed="true"] .note { animation: bob 1.6s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-3px) rotate(8deg); } }
+
+/* =========================================================
+   Pantalla de bienvenida
+   ========================================================= */
+.welcome {
+  min-height: 100vh; min-height: 100dvh;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+  padding: 72px 24px 40px;
+  gap: 8px;
+}
+.welcome h1 {
+  font-family: var(--serif);
+  font-weight: 600; font-style: italic;
+  font-size: clamp(2.3rem, 9vw, 3.4rem);
+  line-height: 1.1;
+  margin: 0 0 6px;
+  color: var(--rose-deep);
+}
+.welcome .lead {
+  font-family: var(--serif);
+  font-size: clamp(1.2rem, 4.6vw, 1.5rem);
+  line-height: 1.5;
+  max-width: 28ch;
+  margin: 0 0 22px;
+  color: var(--ink);
+}
+.hint {
+  margin: 22px 0 6px;
+  font-size: .95rem; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--rose-deep);
+  animation: pulse 2.6s ease-in-out infinite;
+}
+.small-note {
+  font-family: var(--serif); font-style: italic;
+  font-size: 1.1rem; color: var(--ink-soft);
+  max-width: 30ch; margin: 8px 0 0;
+}
+@keyframes pulse { 50% { opacity: .55; } }
+
+/* =========================================================
+   Sobre (hecho solo con CSS)
+   ========================================================= */
+.envelope-btn {
+  position: relative; display: block;
+  width: min(84vw, 320px); aspect-ratio: 3 / 2;
+  padding: 0; margin: 28px 0 0; border: 0; background: none;
+  cursor: pointer; perspective: 900px;
+  -webkit-tap-highlight-color: transparent;
+  filter: drop-shadow(0 14px 18px rgba(143,74,93,.22));
+  animation: sway 5s ease-in-out infinite;
+}
+.envelope-btn.open { animation: none; cursor: default; }
+@keyframes sway { 50% { transform: translateY(-5px) rotate(-.6deg); } }
+
+.envelope-btn > span { position: absolute; display: block; }
+
+.env-back {
+  inset: 0;
+  background: linear-gradient(160deg, #e9b9bf, #d99aa6);
+  border-radius: 6px;
+  z-index: 0;
+}
+.env-card {
+  left: 7%; right: 7%; top: 6%; height: 84%;
+  background: var(--paper);
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.15);
+  z-index: 1;
+  /* Al cerrar: la carta baja primero */
+  transition: transform .9s cubic-bezier(.5,0,.3,1);
+  padding: 14% 12% 0;
+}
+.env-card i {
+  display: block; height: 2px; margin-bottom: 11%;
+  background: rgba(192,132,151,.35); border-radius: 2px;
+}
+.env-card i:nth-child(2) { width: 80%; }
+.env-card i:nth-child(3) { width: 60%; }
+.env-front {
+  inset: 0;
+  background: linear-gradient(180deg, #f0c4c9, #e3a6af);
+  clip-path: polygon(0 0, 50% 58%, 100% 0, 100% 100%, 0 100%);
+  border-radius: 6px;
+  z-index: 3;
+}
+.env-flap {
+  left: 0; right: 0; top: 0; height: 58%;
+  background: linear-gradient(180deg, #d58d9b, #e8aab3);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  z-index: 4;
+  /* Al cerrar: la solapa espera a que la carta baje */
+  transition: transform .8s ease-in-out .7s, z-index 0s linear 1.1s;
+}
+.env-seal {
+  left: 50%; top: 58%;
+  width: 46px; height: 46px; margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #c4566e, #8f2f48);
+  box-shadow: 0 2px 6px rgba(0,0,0,.3), inset 0 0 0 3px rgba(255,255,255,.12);
+  display: flex !important; align-items: center; justify-content: center;
+  color: #ffe4e8;
+  z-index: 5;
+  /* Al cerrar: el sello reaparece al final */
+  transition: opacity .35s 1.5s, transform .35s 1.5s;
+}
+.env-seal svg { width: 22px; height: 22px; fill: currentColor; }
+
+/* Al abrir: la solapa se levanta y luego sube la carta */
+.envelope-btn.open .env-flap {
+  transform: rotateX(180deg); z-index: 1;
+  transition: transform .8s ease-in-out, z-index 0s linear .4s;
+}
+.envelope-btn.open .env-card {
+  transform: translateY(-62%); z-index: 2;
+  transition: transform 1.1s cubic-bezier(.3,.7,.2,1) .75s;
+}
+.envelope-btn.open .env-seal {
+  opacity: 0; transform: scale(.4);
+  transition: opacity .35s, transform .35s;
+}
+
+/* =========================================================
+   La carta
+   ========================================================= */
+.letter-section { padding: 24px 16px 40px; }
+.letter-section[hidden] { display: none; }
+
+.paper {
+  position: relative;
+  max-width: 34rem; margin: 0 auto;
+  padding: clamp(32px, 9vw, 56px) clamp(22px, 8vw, 52px);
+  background:
+    repeating-linear-gradient(180deg, transparent 0, transparent 35px, rgba(192,132,151,.10) 36px),
+    var(--paper);
+  border: 1px solid rgba(192,132,151,.45);
+  border-radius: 6px;
+  box-shadow: 0 2px 0 rgba(255,255,255,.8) inset, 0 18px 40px rgba(143,74,93,.18), 0 2px 6px rgba(143,74,93,.1);
+  opacity: 0; transform: translateY(24px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+.paper::before {
+  content: ""; position: absolute; inset: 8px;
+  border: 1px dashed rgba(192,132,151,.4); border-radius: 3px; pointer-events: none;
+}
+.letter-section.show .paper { opacity: 1; transform: none; }
+
+.poem-title {
+  font-family: var(--serif); font-style: italic; font-weight: 600;
+  font-size: clamp(1.8rem, 7vw, 2.4rem);
+  text-align: center; color: var(--rose-deep);
+  margin: 0 0 8px;
+}
+.poem-title:focus { outline: none; }
+.divider {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  color: var(--rose); margin: 0 auto 30px;
+}
+.divider::before, .divider::after {
+  content: ""; width: 56px; height: 1px; background: currentColor; opacity: .7;
+}
+.divider svg { width: 16px; height: 16px; fill: currentColor; }
+
+.stanza {
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 5vw, 1.45rem);
+  line-height: 1.55;
+  text-align: center;
+  margin: 0 0 2rem;
+}
+.stanza .line { display: block; }
+
+/* Revelado por estrofas */
+.reveal {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 1.1s ease, transform 1.1s ease;
+}
+.reveal.visible { opacity: 1; transform: none; }
+.stanza.reveal .line {
+  opacity: 0; transform: translateY(8px);
+  transition: opacity .9s ease, transform .9s ease;
+  transition-delay: calc(var(--i, 0) * .22s);
+}
+.stanza.reveal.visible .line { opacity: 1; transform: none; }
+
+/* =========================================================
+   Dedicatoria
+   ========================================================= */
+.dedication {
+  max-width: 34rem; margin: 40px auto 0;
+  padding: clamp(28px, 8vw, 44px) clamp(22px, 7vw, 40px);
+  text-align: center;
+  background: linear-gradient(160deg, var(--rose-pastel), #f8e1e1);
+  border: 1px solid var(--rose);
+  border-radius: 14px;
+  box-shadow: 0 14px 30px rgba(143,74,93,.15);
+}
+.dedication h2 {
+  font-family: var(--serif); font-style: italic; font-weight: 600;
+  font-size: clamp(1.7rem, 6.5vw, 2.1rem);
+  color: var(--rose-deep); margin: 0 0 18px;
+}
+.dedication p {
+  font-family: var(--serif);
+  font-size: clamp(1.15rem, 4.6vw, 1.35rem);
+  line-height: 1.6; margin: 0 0 1.1rem; color: var(--ink);
+}
+.dedication .signature { margin: 1.6rem 0 0; font-style: italic; color: var(--rose-deep); }
+
+/* =========================================================
+   Botones de acción finales
+   ========================================================= */
+.actions {
+  display: flex; flex-wrap: wrap; gap: 14px; justify-content: center;
+  max-width: 34rem; margin: 34px auto 0; padding-bottom: 20px;
+}
+.btn {
+  min-height: 52px; min-width: 180px; padding: 0 26px;
+  font: 600 1rem var(--sans);
+  color: var(--rose-deep);
+  background: var(--paper);
+  border: 1.5px solid var(--rose-old);
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 12px rgba(143,74,93,.12);
+  transition: background .2s, transform .15s;
+}
+.btn:hover { background: var(--rose-pastel); }
+.btn:active { transform: scale(.97); }
+.btn.primary { background: var(--rose-old); color: #fff; border-color: var(--rose-old); }
+.btn.primary:hover { background: var(--rose-deep); }
+
+/* =========================================================
+   Accesibilidad: menos movimiento
+   ========================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal, .stanza.reveal .line, .paper { opacity: 1; transform: none; }
+  .envelope-btn.open .env-card { transform: translateY(-62%); }
+}
+
+@media (min-width: 700px) {
+  .letter-section { padding-top: 60px; }
+}
+</style>
+<noscript>
+  <style>
+    /* Sin JavaScript: mostrar la carta directamente */
+    .letter-section[hidden] { display: block; }
+    .paper, .reveal, .stanza.reveal .line { opacity: 1; transform: none; }
+    .envelope-btn, .music-btn, .hint { display: none; }
+  </style>
+</noscript>
+</head>
+<body>
+
+<!-- Símbolo de corazón reutilizable -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="heart" viewBox="0 0 24 24">
+    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+  </symbol>
+</svg>
+
+<div id="hearts-layer" aria-hidden="true"></div>
+
+<button id="music-btn" class="music-btn" type="button" aria-pressed="false">
+  <span class="note" aria-hidden="true">♪</span>
+  <span id="music-label">Activar música</span>
+</button>
+
+<main>
+  <!-- ================= Bienvenida ================= -->
+  <section id="welcome" class="welcome" aria-labelledby="welcome-title">
+    <h1 id="welcome-title">Para ti, mi amor</h1>
+    <p class="lead">Hay algo que quiero regalarte. Está hecho de palabras, recuerdos y mucho cariño.</p>
+
+    <button id="envelope" class="envelope-btn" type="button" aria-expanded="false" aria-controls="carta">
+      <span class="sr-only">Abrir el sobre</span>
+      <span class="env-back"></span>
+      <span class="env-card" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="env-front"></span>
+      <span class="env-flap"></span>
+      <span class="env-seal" aria-hidden="true"><svg><use href="#heart"/></svg></span>
+    </button>
+
+    <p id="hint" class="hint">Toca el sobre para abrirlo</p>
+    <p class="small-note">No es un regalo que puedas envolver, pero sí uno que puedes guardar</p>
+  </section>
+
+  <!-- ================= Carta ================= -->
+  <section id="carta" class="letter-section" hidden aria-labelledby="poem-title">
+    <article class="paper">
+      <h2 id="poem-title" class="poem-title" tabindex="-1">Un cumpleaños a tu lado</h2>
+      <div class="divider" aria-hidden="true"><svg><use href="#heart"/></svg></div>
+
+      <!-- Poema: texto literal, respetando palabras, orden y puntuación -->
+      <div id="poem">
+        <p class="stanza reveal">
+          <span class="line" style="--i:0">Hola mi amor</span>
+          <span class="line" style="--i:1">¿Cómo estás?</span>
+          <span class="line" style="--i:2">Espero que cuando leas esto</span>
+          <span class="line" style="--i:3">No te vayas para atrás</span>
+        </p>
+
+        <p class="stanza reveal">
+          <span class="line" style="--i:0">Hoy es tu día,</span>
+          <span class="line" style="--i:1">tu cumpleaños esperado;</span>
+          <span class="line" style="--i:2">hoy cumples ya 26,</span>
+          <span class="line" style="--i:3">y es apenas el segundo que paso a tu lado.</span>
+        </p>
+
+        <p class="stanza reveal">
+          <span class="line" style="--i:0">Sé que han pasado muchas cosas,</span>
+          <span class="line" style="--i:1">te he visto triste y te he visto contenta</span>
+          <span class="line" style="--i:2">y tengo el placer de decir</span>
+          <span class="line" style="--i:3">que haces que la vida contigo se sienta más lenta.</span>
+        </p>
+
+        <p class="stanza reveal">
+          <span class="line" style="--i:0">Hoy es tu día,</span>
+          <span class="line" style="--i:1">hoy celebramos tus años</span>
+          <span class="line" style="--i:2">mira hacia atrás y notarás</span>
+          <span class="line" style="--i:3">que has cambiado mucho en este último año.</span>
+        </p>
+
+        <p class="stanza reveal">
+          <span class="line" style="--i:0">Hace exactamente un año aún</span>
+          <span class="line" style="--i:1">no eras ni egresada,</span>
+          <span class="line" style="--i:2">hoy puedes pararte</span>
+          <span class="line" style="--i:3">orgullosa y presumir que ya eres abogada.</span>
+        </p>
+
+        <p class="stanza reveal">
+          <span class="line" style="--i:0">Sé que en este mundo</span>
+          <span class="line" style="--i:1">la realidad es muy dura,</span>
+          <span class="line" style="--i:2">pero también sé que a tu lado</span>
+          <span class="line" style="--i:3">cada día es una aventura.</span>
+        </p>
+
+        <p class="stanza reveal">
+          <span class="line" style="--i:0">Orgulloso estoy de decir</span>
+          <span class="line" style="--i:1">que soy tu novio</span>
+          <span class="line" style="--i:2">no me preguntes si te amo</span>
+          <span class="line" style="--i:3">porque lo que siento es más que obvio.</span>
+        </p>
+
+        <p class="stanza reveal">
+          <span class="line" style="--i:0">Muchas gracias, mi amor,</span>
+          <span class="line" style="--i:1">por dejarme estar en tu vida</span>
+          <span class="line" style="--i:2">te amaré hoy, te amaré mañana</span>
+          <span class="line" style="--i:3">y espero estar contigo toda la vida.</span>
+        </p>
+      </div>
+    </article>
+
+    <!-- Dedicatoria final -->
+    <aside class="dedication reveal" aria-labelledby="ded-title">
+      <h2 id="ded-title" class="sr-only">Dedicatoria</h2>
+      <p>Feliz cumpleaños, mi amor.</p>
+      <p>Estoy muy orgulloso de ti, de todo lo que has logrado y de la persona en la que te estás convirtiendo.</p>
+      <p>Gracias por dejarme compartir otro año de tu vida. Ojalá este sea uno de muchos cumpleaños que nos queden por celebrar juntos.</p>
+      <p class="signature">Con todo mi amor, para ti. ♡</p>
+    </aside>
+
+    <div class="actions reveal">
+      <button id="reread" class="btn primary" type="button">Releer la carta</button>
+      <button id="totop" class="btn" type="button">Volver al principio</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------------------------------------------------------
+     Utilidades
+     --------------------------------------------------------- */
+  var $ = function (id) { return document.getElementById(id); };
+  var reducedQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var reduced = function () { return reducedQuery.matches; };
+
+  var envelope = $('envelope');
+  var hint = $('hint');
+  var carta = $('carta');
+  var poemTitle = $('poem-title');
+  var layer = $('hearts-layer');
+  var opened = false;
+
+  /* ---------------------------------------------------------
+     Corazones flotantes (máx. 10 simultáneos)
+     --------------------------------------------------------- */
+  var MAX_HEARTS = 10;
+  var colors = ['#e2a3ab', '#c08497', '#f2cfd2', '#d58d9b'];
+
+  function spawnHeart() {
+    if (reduced() || document.hidden) return;
+    if (layer.children.length >= MAX_HEARTS) return;
+    var h = document.createElement('span');
+    h.className = 'float-heart';
+    h.innerHTML = '<svg aria-hidden="true"><use href="#heart"/></svg>';
+    var size = 12 + Math.random() * 16;
+    h.style.left = (Math.random() * 100) + '%';
+    h.style.setProperty('--s', size + 'px');
+    h.style.setProperty('--d', (8 + Math.random() * 6) + 's');
+    h.style.setProperty('--x', (Math.random() * 60 - 30) + 'px');
+    h.style.setProperty('--o', (0.35 + Math.random() * 0.3).toFixed(2));
+    h.style.setProperty('--c', colors[Math.floor(Math.random() * colors.length)]);
+    h.addEventListener('animationend', function () { h.remove(); });
+    layer.appendChild(h);
+  }
+
+  function burstHearts(n) {
+    for (var i = 0; i < n; i++) setTimeout(spawnHeart, i * 140);
+  }
+
+  // Ambiente: un corazón cada ~2.8 s, sin saturar
+  setInterval(spawnHeart, 2800);
+
+  /* ---------------------------------------------------------
+     Revelado por estrofas con IntersectionObserver
+     --------------------------------------------------------- */
+  var revealEls = Array.prototype.slice.call(document.querySelectorAll('.reveal'));
+  var observer = null;
+
+  if ('IntersectionObserver' in window) {
+    observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3, rootMargin: '0px 0px -8% 0px' });
+  }
+
+  function armReveal() {
+    revealEls.forEach(function (el) {
+      if (reduced() || !observer) {
+        el.classList.add('visible');
+      } else {
+        observer.observe(el);
+      }
+    });
+  }
+
+  /* ---------------------------------------------------------
+     Abrir el sobre (táctil, ratón y teclado: todo vía "click")
+     --------------------------------------------------------- */
+  function openEnvelope() {
+    if (opened) return;           // evita repetir la animación
+    opened = true;
+    envelope.classList.add('open');
+    envelope.setAttribute('aria-expanded', 'true');
+    envelope.setAttribute('aria-disabled', 'true');
+    hint.style.visibility = 'hidden';
+    burstHearts(8);
+
+    var wait = reduced() ? 0 : 2000; // tiempo de la animación del sobre
+
+    setTimeout(function () {
+      carta.hidden = false;
+      void carta.offsetWidth;       // fuerza reflow para que la transición se aplique
+      carta.classList.add('show');
+      armReveal();
+      setTimeout(function () {
+        carta.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+        try { poemTitle.focus({ preventScroll: true }); } catch (e) { poemTitle.focus(); }
+      }, reduced() ? 0 : 250);
+    }, wait);
+  }
+
+  envelope.addEventListener('click', openEnvelope);
+
+  /* ---------------------------------------------------------
+     Botones finales
+     --------------------------------------------------------- */
+  $('reread').addEventListener('click', function () {
+    revealEls.forEach(function (el) { el.classList.remove('visible'); });
+    carta.scrollIntoView({ behavior: reduced() ? 'auto' : 'smooth', block: 'start' });
+    setTimeout(armReveal, reduced() ? 0 : 500);
+    burstHearts(4);
+  });
+
+  // Volver al principio: sube, y cuando llega arriba cierra el sobre
+  // para que se pueda volver a abrir.
+  var closing = false;
+
+  function closeEnvelope() {
+    carta.classList.remove('show');
+    carta.hidden = true;
+    revealEls.forEach(function (el) {
+      el.classList.remove('visible');
+      if (observer) observer.unobserve(el);
+    });
+    envelope.classList.remove('open');
+    envelope.setAttribute('aria-expanded', 'false');
+    envelope.removeAttribute('aria-disabled');
+    hint.style.visibility = 'visible';
+    // Esperar a que termine la animación de cierre antes de permitir reabrir
+    setTimeout(function () {
+      opened = false;
+      closing = false;
+      envelope.focus({ preventScroll: true });
+    }, reduced() ? 0 : 2400);
+  }
+
+  $('totop').addEventListener('click', function () {
+    if (closing) return;
+    closing = true;
+    window.scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' });
+
+    // Esperar a llegar arriba (máx. 1.5 s) y luego cerrar el sobre
+    var waited = 0;
+    var check = setInterval(function () {
+      waited += 100;
+      if (window.scrollY <= 2 || waited >= 1500) {
+        clearInterval(check);
+        closeEnvelope();
+      }
+    }, 100);
+  });
+
+  /* ---------------------------------------------------------
+     Música con Web Audio API (sin archivos externos)
+     Progresión Cmaj7 – Am7 – Fmaj7 – G6, tipo caja de música
+     con colchón suave, bajo discreto y reverberación.
+     --------------------------------------------------------- */
+  var Music = (function () {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    var ctx = null, master = null, wet = null;
+    var timer = null, nextTime = 0, step = 0, playing = false;
+    var BPM = 64;
+    var eighth = 60 / BPM / 2;
+
+    function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+
+    // Acordes (notas MIDI), raíz del bajo y melodía por compás (8 corcheas)
+    var bars = [
+      { c: [60, 64, 67, 71], b: 48, m: [76, 0, 0, 0, 74, 0, 72, 0] },
+      { c: [57, 60, 64, 67], b: 45, m: [72, 0, 76, 0, 79, 0, 0, 0] },
+      { c: [53, 57, 60, 64], b: 41, m: [77, 0, 0, 0, 76, 0, 72, 0] },
+      { c: [55, 59, 62, 64], b: 43, m: [74, 0, 0, 0, 71, 0, 0, 0] },
+      { c: [60, 64, 67, 71], b: 48, m: [79, 0, 0, 0, 76, 0, 72, 0] },
+      { c: [57, 60, 64, 67], b: 45, m: [76, 0, 0, 0, 72, 0, 69, 0] },
+      { c: [53, 57, 60, 64], b: 41, m: [72, 0, 74, 0, 77, 0, 0, 0] },
+      { c: [55, 59, 62, 64], b: 43, m: [74, 0, 0, 0, 0, 0, 0, 0] }
+    ];
+    var arpPattern = [0, 1, 2, 3, 2, 1, 2, 1];
+
+    function makeReverb(seconds) {
+      var rate = ctx.sampleRate, len = Math.floor(rate * seconds);
+      var buf = ctx.createBuffer(2, len, rate);
+      for (var ch = 0; ch < 2; ch++) {
+        var d = buf.getChannelData(ch);
+        for (var i = 0; i < len; i++) {
+          d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6);
+        }
+      }
+      return buf;
+    }
+
+    function init() {
+      ctx = new AC();
+      master = ctx.createGain();
+      master.gain.value = 0;
+
+      var lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 3200;
+
+      var conv = ctx.createConvolver();
+      conv.buffer = makeReverb(2.8);
+      wet = ctx.createGain();
+      wet.gain.value = 0.45;
+
+      lp.connect(master);
+      lp.connect(conv);
+      conv.connect(wet);
+      wet.connect(master);
+      master.connect(ctx.destination);
+      ctx._input = lp;
+    }
+
+    // Una nota con envolvente suave
+    function note(freq, t, dur, type, vol, attack) {
+      var o = ctx.createOscillator();
+      var g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(vol, t + attack);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g);
+      g.connect(ctx._input);
+      o.start(t);
+      o.stop(t + dur + 0.05);
+    }
+
+    function scheduleStep(i, t) {
+      var bar = bars[Math.floor(i / 8) % bars.length];
+      var pos = i % 8;
+
+      if (pos === 0) {
+        // Colchón (pad) y bajo, una vez por compás
+        var barDur = eighth * 8;
+        bar.c.forEach(function (m) {
+          note(mtof(m - 12), t, barDur * 1.15, 'sine', 0.035, 0.6);
+        });
+        note(mtof(bar.b), t, barDur * 0.95, 'sine', 0.09, 0.04);
+      }
+
+      // Arpegio tipo caja de música
+      var arpMidi = bar.c[arpPattern[pos]] + 12;
+      var vel = 0.05 + Math.random() * 0.02;
+      note(mtof(arpMidi), t, 1.4, 'triangle', vel, 0.01);
+
+      // Melodía
+      if (bar.m[pos]) {
+        note(mtof(bar.m[pos]), t, eighth * 4.2, 'sine', 0.11, 0.03);
+        note(mtof(bar.m[pos] + 12), t, eighth * 2.5, 'sine', 0.02, 0.02);
+      }
+    }
+
+    function scheduler() {
+      while (nextTime < ctx.currentTime + 0.5) {
+        scheduleStep(step, nextTime);
+        nextTime += eighth;
+        step++;
+      }
+    }
+
+    function play() {
+      if (!AC) return false;
+      if (!ctx) init();
+      // resume() dentro del gesto del usuario: necesario en iOS y Android
+      var p = ctx.resume();
+      if (p && p.catch) p.catch(function () {});
+      var now = ctx.currentTime;
+      master.gain.cancelScheduledValues(now);
+      master.gain.setValueAtTime(master.gain.value, now);
+      master.gain.linearRampToValueAtTime(0.9, now + 1.2);
+      nextTime = now + 0.15;
+      if (!timer) timer = setInterval(scheduler, 120);
+      scheduler();
+      playing = true;
+      return true;
+    }
+
+    function pause() {
+      if (!ctx) return;
+      var now = ctx.currentTime;
+      master.gain.cancelScheduledValues(now);
+      master.gain.setValueAtTime(master.gain.value, now);
+      master.gain.linearRampToValueAtTime(0, now + 0.5);
+      clearInterval(timer);
+      timer = null;
+      playing = false;
+      setTimeout(function () { if (!playing && ctx) ctx.suspend(); }, 650);
+    }
+
+    return {
+      play: play, pause: pause,
+      isPlaying: function () { return playing; },
+      supported: !!AC
+    };
+  })();
+
+  var musicBtn = $('music-btn');
+  var musicLabel = $('music-label');
+
+  function renderMusic() {
+    var on = Music.isPlaying();
+    musicBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    musicLabel.textContent = on ? 'Pausar música' : 'Activar música';
+  }
+
+  if (!Music.supported) {
+    musicBtn.hidden = true; // navegador sin Web Audio: se oculta el botón
+  }
+
+  musicBtn.addEventListener('click', function () {
+    if (Music.isPlaying()) Music.pause(); else Music.play();
+    renderMusic();
+  });
+
+  // Si la pestaña pasa a segundo plano, se pausa para no consumir batería
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && Music.isPlaying()) {
+      Music.pause();
+      renderMusic();
+    }
+  });
+})();
+</script>
+</body>
+</html>
